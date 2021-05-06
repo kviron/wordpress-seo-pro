@@ -1,5 +1,5 @@
   {
-  "name": "kviron/wordpress-plugin-yseo",
+  "name": "kviron/wordpress-seo",
   "type": "wordpress-plugin",
   "license" : "MIT",
   "minimum-stability": "stable",
