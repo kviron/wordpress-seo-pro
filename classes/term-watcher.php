@@ -120,21 +120,6 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 */
 	public function detect_slug_change( $term_id, $tt_id, $taxonomy ) {
 		/**
-		 * Filter: 'wpseo_premium_term_redirect_slug_change' - Check if a redirect should be created
-		 * on term slug change.
-		 *
-		 * @deprecated 12.9.0. Use the {@see 'Yoast\WP\SEO\term_redirect_slug_change'} filter instead.
-		 *
-		 * @api bool unsigned
-		 */
-		$create_redirect = apply_filters_deprecated(
-			'wpseo_premium_term_redirect_slug_change',
-			[ false ],
-			'YoastSEO Premium 12.9.0',
-			'Yoast\WP\SEO\term_redirect_slug_change'
-		);
-
-		/**
 		 * Filter: 'Yoast\WP\SEO\term_redirect_slug_change' - Check if a redirect should be created
 		 * on term slug change.
 		 *
@@ -144,7 +129,7 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 		 *
 		 * @api bool unsigned
 		 */
-		if ( apply_filters( 'Yoast\WP\SEO\term_redirect_slug_change', $create_redirect ) === true ) {
+		if ( apply_filters( 'Yoast\WP\SEO\term_redirect_slug_change', false ) === true ) {
 			return true;
 		}
 
@@ -168,7 +153,17 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 		$new_url = $this->get_target_url( $term_id, $taxonomy );
 
 		// Maybe we can undo the created redirect.
-		$this->notify_undo_slug_redirect( $old_url, $new_url );
+		$created_redirect = $this->notify_undo_slug_redirect( $old_url, $new_url, $term_id, 'term' );
+
+		if ( $created_redirect ) {
+			$redirect_info = [
+				'origin' => $created_redirect->get_origin(),
+				'target' => $created_redirect->get_target(),
+				'type'   => $created_redirect->get_type(),
+				'format' => $created_redirect->get_format(),
+			];
+			update_term_meta( $term_id, '_yoast_term_redirect_info', $redirect_info );
+		}
 	}
 
 	/**
@@ -183,9 +178,8 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 			return;
 		}
 
-		if ( $this->is_redirect_needed( $term ) ) {
-			$url = $this->get_target_url( $term, $term->taxonomy );
-
+		$url = $this->get_target_url( $term, $term->taxonomy );
+		if ( $this->is_redirect_needed( $term, $url ) ) {
 			$this->set_delete_notification( $url );
 		}
 	}
@@ -194,11 +188,14 @@ class WPSEO_Term_Watcher extends WPSEO_Watcher implements WPSEO_WordPress_Integr
 	 * Checks if a redirect is needed for the term with the given ID.
 	 *
 	 * @param WP_Term $term The term to check.
+	 * @param string  $url  The target url.
 	 *
 	 * @return bool If a redirect is needed.
 	 */
-	protected function is_redirect_needed( $term ) {
-		return ! \is_nav_menu( $term->term_id ) && \is_taxonomy_viewable( $term->taxonomy );
+	protected function is_redirect_needed( $term, $url ) {
+		$redirect_manager = new WPSEO_Redirect_Manager( 'plain' );
+		$redirect         = $redirect_manager->get_redirect( $url );
+		return ! $redirect || ( ! \is_nav_menu( $term->term_id ) && \is_taxonomy_viewable( $term->taxonomy ) );
 	}
 
 	/**

@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore Yoast.Files.FileName.InvalidClassFileName
 /**
  * WPSEO Premium plugin file.
  *
@@ -44,6 +44,7 @@ class WPSEO_Premium_Assets implements WPSEO_WordPress_Integration {
 	 */
 	protected function get_version() {
 		$asset_manager = new WPSEO_Admin_Asset_Manager();
+
 		return $asset_manager->flatten_version( WPSEO_PREMIUM_VERSION );
 	}
 
@@ -86,6 +87,28 @@ class WPSEO_Premium_Assets implements WPSEO_WordPress_Integration {
 					WPSEO_Admin_Asset_Manager::PREFIX . 'search-metadata-previews',
 					WPSEO_Admin_Asset_Manager::PREFIX . 'social-metadata-forms',
 					WPSEO_Admin_Asset_Manager::PREFIX . 'social-metadata-previews-package',
+					WPSEO_Admin_Asset_Manager::PREFIX . 'yoast-components',
+				],
+			],
+			[
+				'name'         => 'yoast-seo-premium-workouts',
+				'path'         => 'assets/js/dist/',
+				'filename'     => 'workouts-' . $version . WPSEO_CSSJS_SUFFIX . '.js',
+				'dependencies' => [
+					'clipboard',
+					'lodash',
+					'wp-api-fetch',
+					'wp-a11y',
+					'wp-components',
+					'wp-compose',
+					'wp-data',
+					'wp-dom-ready',
+					'wp-element',
+					'wp-i18n',
+					'yoast-seo-premium-commons',
+					WPSEO_Admin_Asset_Manager::PREFIX . 'analysis',
+					WPSEO_Admin_Asset_Manager::PREFIX . 'editor-modules',
+					WPSEO_Admin_Asset_Manager::PREFIX . 'react-select',
 					WPSEO_Admin_Asset_Manager::PREFIX . 'yoast-components',
 				],
 			],
@@ -238,6 +261,14 @@ class WPSEO_Premium_Assets implements WPSEO_WordPress_Integration {
 				],
 				'footer'       => true,
 			],
+			[
+				'name'         => 'wp-seo-premium-schema-blocks',
+				'path'         => 'assets/js/dist/',
+				'filename'     => 'wp-seo-premium-schema-blocks-' . $version . WPSEO_CSSJS_SUFFIX . '.js',
+				'dependencies' => [
+					WPSEO_Admin_Asset_Manager::PREFIX . 'schema-blocks-package',
+				],
+			],
 		];
 	}
 
@@ -258,6 +289,13 @@ class WPSEO_Premium_Assets implements WPSEO_WordPress_Integration {
 				'dependencies' => [],
 			],
 			[
+				'name'         => WPSEO_Admin_Asset_Manager::PREFIX . 'premium-workouts',
+				'source'       => 'assets/css/dist/premium-workouts-' . $version . '.css',
+				'dependencies' => [
+					'wp-components',
+				],
+			],
+			[
 				'name'         => 'elementor-premium',
 				'source'       => 'assets/css/dist/premium-elementor-' . $version . '.css',
 				'dependencies' => [
@@ -270,6 +308,11 @@ class WPSEO_Premium_Assets implements WPSEO_WordPress_Integration {
 				'dependencies' => [
 					WPSEO_Admin_Asset_Manager::PREFIX . 'schema-blocks',
 				],
+			],
+			[
+				'name'         => WPSEO_Admin_Asset_Manager::PREFIX . 'premium-thank-you',
+				'source'       => 'assets/css/dist/premium-thank-you-' . $version . '.css',
+				'dependencies' => [],
 			],
 		];
 	}

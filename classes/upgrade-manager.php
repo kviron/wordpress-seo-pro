@@ -94,6 +94,86 @@ class WPSEO_Upgrade_Manager {
 		if ( version_compare( $version_number, '16.2-RC0', '<' ) ) {
 			add_action( 'init', [ $this, 'upgrade_16_2' ], 12 );
 		}
+
+		if ( version_compare( $version_number, '16.3-beta2', '<' ) ) {
+			add_action( 'init', [ $this, 'upgrade_16_3' ], 12 );
+		}
+
+		if ( version_compare( $version_number, '17.2-RC0', '<' ) ) {
+			add_action( 'init', [ $this, 'upgrade_17_2' ], 12 );
+		}
+
+		if ( version_compare( $version_number, '17.3-RC4', '<' ) ) {
+			add_action( 'init', [ $this, 'upgrade_17_3' ], 12 );
+		}
+
+		if ( version_compare( $version_number, '17.4-RC0', '<' ) ) {
+			add_action( 'init', [ $this, 'upgrade_17_4' ], 12 );
+		}
+	}
+
+	/**
+	 * Schedules the cleanup integration if it's no already scheduled.
+	 *
+	 * @return void
+	 */
+	public function upgrade_17_4() {
+		$this->retrigger_cleanup();
+	}
+
+	/**
+	 * Clears the first step of the orphaned workout.
+	 *
+	 * @return void
+	 */
+	public function upgrade_17_3() {
+		$workouts_option = WPSEO_Options::get( 'workouts' );
+
+		if ( isset( $workouts_option['orphaned'] )
+			&& isset( $workouts_option['orphaned']['indexablesByStep'] )
+			&& is_array( $workouts_option['orphaned']['indexablesByStep'] )
+		) {
+			$workouts_option['orphaned']['indexablesByStep']['improveRemove'] = [];
+			WPSEO_Options::set( 'workouts', $workouts_option );
+		}
+	}
+
+	/**
+	 * Schedules the cleanup integration if it's no already scheduled.
+	 *
+	 * @return void
+	 */
+	public function upgrade_17_2() {
+		$this->retrigger_cleanup();
+	}
+
+	/**
+	 * Re-triggers the cleanup of old things from the database.
+	 *
+	 * @return void
+	 */
+	protected function retrigger_cleanup() {
+		// If Yoast SEO hasn't been upgraded to 17.2 the cleanup integration has not been implemented in the current way.
+		if ( ! \defined( '\Yoast\WP\SEO\Integrations\Cleanup_Integration::START_HOOK' ) ) {
+			return;
+		}
+		// If Yoast SEO premium was upgraded after Yoast SEO, reschedule the task to clean out orphaned prominent words.
+		if ( ! \wp_next_scheduled( \Yoast\WP\SEO\Integrations\Cleanup_Integration::START_HOOK ) ) {
+			\wp_schedule_single_event( ( time() + ( MINUTE_IN_SECONDS * 5 ) ), \Yoast\WP\SEO\Integrations\Cleanup_Integration::START_HOOK );
+		}
+	}
+
+	/**
+	 * Runs the language pack upgrader to migrate to TranslationsPress.
+	 *
+	 * @return void
+	 */
+	public function upgrade_16_3() {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		$upgrader       = new WP_Upgrader();
+		$upgrader->skin = new Automatic_Upgrader_Skin();
+		Language_Pack_Upgrader::async_upgrade( $upgrader );
 	}
 
 	/**
@@ -183,6 +263,7 @@ class WPSEO_Upgrade_Manager {
 		if ( $this->should_retry_upgrade_31() ) {
 			if ( $immediately ) {
 				WPSEO_Redirect_Upgrade::upgrade_3_1();
+
 				return;
 			}
 			add_action( 'wp', [ 'WPSEO_Redirect_Upgrade', 'upgrade_3_1' ], 12 );

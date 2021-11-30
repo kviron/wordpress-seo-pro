@@ -11,6 +11,7 @@
  * @todo This class could use a general description with some explanation on sitemaps. OR.
  */
 class WPSEO_Sitemaps {
+
 	/**
 	 * Sitemap index identifier.
 	 *
@@ -181,7 +182,7 @@ class WPSEO_Sitemaps {
 	 * Set the sitemap current page to allow creating partial sitemaps with WP-CLI
 	 * in a one-off process.
 	 *
-	 * @param integer $current_page The part that should be generated.
+	 * @param int $current_page The part that should be generated.
 	 */
 	public function set_n( $current_page ) {
 		if ( is_scalar( $current_page ) && intval( $current_page ) > 0 ) {
@@ -407,9 +408,9 @@ class WPSEO_Sitemaps {
 	/**
 	 * Spits out the XSL for the XML sitemap.
 	 *
-	 * @param string $type Type to output.
-	 *
 	 * @since 1.4.13
+	 *
+	 * @param string $type Type to output.
 	 */
 	public function xsl_output( $type ) {
 
@@ -443,7 +444,8 @@ class WPSEO_Sitemaps {
 	 */
 	public function output() {
 		$this->send_headers();
-		echo $this->renderer->get_output( $this->sitemap, $this->transient );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaping sitemap as either xml or html results in empty document.
+		echo $this->renderer->get_output( $this->sitemap );
 	}
 
 	/**
@@ -584,9 +586,9 @@ class WPSEO_Sitemaps {
 	/**
 	 * Get post statuses for post_type or the root sitemap.
 	 *
-	 * @param string $type Provide a type for a post_type sitemap, SITEMAP_INDEX_TYPE for the root sitemap.
-	 *
 	 * @since 10.2
+	 *
+	 * @param string $type Provide a type for a post_type sitemap, SITEMAP_INDEX_TYPE for the root sitemap.
 	 *
 	 * @return array List of post statuses.
 	 */

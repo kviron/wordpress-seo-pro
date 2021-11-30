@@ -27,12 +27,12 @@ class InstalledVersions
 private static $installed = array (
   'root' => 
   array (
-    'pretty_version' => '16.2',
-    'version' => '16.2.0.0',
+    'pretty_version' => '17.6',
+    'version' => '17.6.0.0',
     'aliases' => 
     array (
     ),
-    'reference' => 'a478a65fed7aadeebd091d5af7603475e307348c',
+    'reference' => '76b2f1aa19e1a4ce16033e762129351e9f1217aa',
     'name' => 'yoast/wordpress-seo',
   ),
   'versions' => 
@@ -71,12 +71,12 @@ private static $installed = array (
     ),
     'yoast/wordpress-seo' => 
     array (
-      'pretty_version' => '16.2',
-      'version' => '16.2.0.0',
+      'pretty_version' => '17.6',
+      'version' => '17.6.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'a478a65fed7aadeebd091d5af7603475e307348c',
+      'reference' => '76b2f1aa19e1a4ce16033e762129351e9f1217aa',
     ),
   ),
 );
@@ -259,9 +259,23 @@ return $installed[0]['root'];
 
 
 
+
 public static function getRawData()
 {
+@trigger_error('getRawData only returns the first dataset loaded, which may not be what you expect. Use getAllRawData() instead which returns all datasets for all autoloaders present in the process.', E_USER_DEPRECATED);
+
 return self::$installed;
+}
+
+
+
+
+
+
+
+public static function getAllRawData()
+{
+return self::getInstalled();
 }
 
 

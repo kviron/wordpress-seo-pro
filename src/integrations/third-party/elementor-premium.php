@@ -1,6 +1,6 @@
 <?php
 
-namespace Yoast\WP\SEO\Integrations\Third_Party;
+namespace Yoast\WP\SEO\Premium\Integrations\Third_Party;
 
 use WP_Post;
 use WPSEO_Admin_Asset_Yoast_Components_L10n;
@@ -18,9 +18,9 @@ use WPSEO_Premium_Prominent_Words_Support;
 use WPSEO_Social_Previews;
 use WPSEO_Utils;
 use Yoast\WP\SEO\Conditionals\Third_Party\Elementor_Edit_Conditional;
-use Yoast\WP\SEO\Helpers\Prominent_Words_Helper;
-use Yoast\WP\SEO\Integrations\Admin\Prominent_Words\Indexing_Integration;
 use Yoast\WP\SEO\Integrations\Integration_Interface;
+use Yoast\WP\SEO\Premium\Helpers\Prominent_Words_Helper;
+use Yoast\WP\SEO\Premium\Integrations\Admin\Prominent_Words\Indexing_Integration;
 
 /**
  * Elementor integration class for Yoast SEO Premium.
@@ -150,8 +150,13 @@ class Elementor_Premium implements Integration_Interface {
 			'licensedURL'        => WPSEO_Utils::get_home_url(),
 			'settingsPageUrl'    => \admin_url( 'admin.php?page=wpseo_dashboard#top#features' ),
 			'integrationsTabURL' => \admin_url( 'admin.php?page=wpseo_dashboard#top#integrations' ),
+
 		];
 		$data = \array_merge( $data, $this->get_post_metabox_config() );
+
+		if ( \current_user_can( 'edit_others_posts' ) ) {
+			$data['workoutsUrl'] = \admin_url( 'admin.php?page=wpseo_workouts' );
+		}
 
 		// Use an extra level in the array to preserve booleans. WordPress sanitizes scalar values in the first level of the array.
 		\wp_localize_script( static::SCRIPT_HANDLE, 'wpseoPremiumMetaboxData', [ 'data' => $data ] );
